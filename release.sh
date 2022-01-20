@@ -111,14 +111,16 @@ fi
 
 
 # Setup next version
-echo "version-minor $VERSION_MINOR"
-echo "version-major $VERSION_MAJOR"
+echo "release script version-minor $VERSION_MINOR"
+echo "release script version-major $VERSION_MAJOR"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_NUMBER" ]]; then
       MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_NUMBER}"
 else 
   if [[ "$VERSION_MINOR" == "true" ]]; then
+      echo "version-minor if branch"
       MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
   elif [[ "$VERSION_MAJOR" == "true" ]]; then
+      echo "version-major if branch"
       MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
   fi
 fi
