@@ -135,6 +135,11 @@ if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MAJOR" ]]; then
 fi
 ##
 
+DEBUG_RELEASE_VERSION=$(mvn help:evaluate -Dexpression="$RELEASE_VERSION_MAJOR")
+DEBUG_DEVLOPMENT_VERSION=$(mvn help:evaluate -Dexpression="$DEVELOPMENT_VERSION_MAJOR")
+echo "### Debug release version: $DEBUG_RELEASE_VERSION"
+echo "### Debug release version: $DEBUG_DEVLOPMENT_VERSION"
+
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTIONS
 if [[ "$VERSION_CORE" == "minor" ]]; then
     MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR -DreleaseVersion=$RELEASE_VERSION_MINOR"
@@ -150,7 +155,9 @@ if [[ -n "$MAVEN_RELEASE_VERSION_NUMBER" ]]; then
       MAVEN_OPTION="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_NUMBER}"
 fi
 
+echo "#### MAVEN_OPTIONS ####"
 echo "$MAVEN_OPTION"
+printf "\n#### END MAVEN_OPTIONS ####"
 
 # Set access-token for gitrepo
 if [[ -n "$GITREPO_ACCESS_TOKEN" && -z "${SSH_PRIVATE_KEY}" ]]; then
@@ -163,13 +170,13 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-mvn $MAVEN_OPTION $MAVEN_REPO_LOCAL build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
+mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-  mvn $MAVEN_OPTION $MAVEN_REPO_LOCAL build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+  mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
