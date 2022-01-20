@@ -111,6 +111,8 @@ fi
 
 
 # Setup next version
+echo "version-minor $VERSION_MINOR"
+echo "version-major $VERSION_MAJOR"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_NUMBER" ]]; then
       MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_NUMBER}"
 else 
