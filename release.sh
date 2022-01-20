@@ -135,10 +135,10 @@ if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MAJOR" ]]; then
 fi
 ##
 
-DEBUG_RELEASE_VERSION=$(mvn help:evaluate -Dexpression="$RELEASE_VERSION_MAJOR")
-DEBUG_DEVLOPMENT_VERSION=$(mvn help:evaluate -Dexpression="$DEVELOPMENT_VERSION_MAJOR")
-echo "### Debug release version: $DEBUG_RELEASE_VERSION"
-echo "### Debug release version: $DEBUG_DEVLOPMENT_VERSION"
+#DEBUG_RELEASE_VERSION=$(mvn help:evaluate -Dexpression="$RELEASE_VERSION_MAJOR")
+#DEBUG_DEVLOPMENT_VERSION=$(mvn help:evaluate -Dexpression="$DEVELOPMENT_VERSION_MAJOR")
+#echo "### Debug release version: $DEBUG_RELEASE_VERSION"
+#echo "### Debug release version: $DEBUG_DEVLOPMENT_VERSION"
 
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTIONS
 if [[ "$VERSION_CORE" == "minor" ]]; then
