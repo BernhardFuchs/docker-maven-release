@@ -12,9 +12,9 @@ set -e
 #fi
 
 if [ -d "${M2_HOME_FOLDER}" ]; then
-     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache"; 
-else 
-     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache"; 
+     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache";
+else
+     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache";
 fi
 
 # Filter the branch to execute the release on
@@ -28,7 +28,7 @@ fi
 #     echo "We are on the release branch"
 #fi
 
-#Configure the default env variables
+Configure the default env variables
 if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
   SSH_ROOT_FOLDER=~/.ssh
 fi
@@ -56,7 +56,7 @@ if [[ "$SKIP_GIT_SANITY_CHECK" == "false" ]]; then
   git checkout ${CI_COMMIT_REF_NAME##*/}
   echo "Git reset hard to ${CI_COMMIT_SHA}"
   git reset --hard ${CI_COMMIT_SHA}
-else 
+else
   echo "Skipping git sanity check"
 fi
 
@@ -103,34 +103,52 @@ setup-maven-servers.sh
 
 APP_VERSION=`xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml`
 #verify we are not on a release tag
-if [[ "$APP_VERSION" == *0 ]]; then 
+if [[ "$APP_VERSION" == *0 ]]; then
      echo "Release is not a snapshot, move to next patch version and to snapshot"
      mvn  build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT
      git commit -am "Prepare version for next release"
 fi
 
+if [ "$VERSION_CORE" == "patch" ]; then
+    VERSION_MINOR="false"
+    VERSION_MAJOR="false"
+elif [ "$VERSION_CORE" == "minor" ]; then
+    VERSION_MINOR="true"
+    VERSION_MAJOR="false"
+elif [ "$VERSION_CORE" == "major" ]; then
+    VERSION_MINOR="false"
+    VERSION_MAJOR="true"
+fi
 
 # Setup next version
 echo "release script version-minor $VERSION_MINOR"
 echo "release script version-major $VERSION_MAJOR"
-if [[ -n "$MAVEN_DEVELOPMENT_VERSION_NUMBER" ]]; then
-      MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_NUMBER}"
-else 
-  if [[ "$VERSION_MINOR" == "true" ]]; then
-      echo "version-minor if branch"
-      MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
-  elif [[ "$VERSION_MAJOR" == "true" ]]; then
-      echo "version-major if branch"
-      MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
-  fi
+DEVELOPMENT_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
+if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR" ]]; then
+      DEVELOPMENT_VERSION_MINOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
 fi
 
+DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
+if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR" ]]; then
+      DEVELOPMENT_VERSION_MAJOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
+fi
+
+if [[ "$VERSION_MINOR" == "true" ]]; then
+    echo "version-minor if branch"
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR"
+elif [[ "$VERSION_MAJOR" == "true" ]]; then
+    echo "version-major if branch"
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MAJOR"
+else
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT"
+fi
 
 # Setup release version
 if [[ -n "$MAVEN_RELEASE_VERSION_NUMBER" ]]; then
       MAVEN_OPTION="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_NUMBER}"
 fi
 
+echo "$MAVEN_OPTION"
 
 # Set access-token for gitrepo
 if [[ -n "$GITREPO_ACCESS_TOKEN" && -z "${SSH_PRIVATE_KEY}" ]]; then
