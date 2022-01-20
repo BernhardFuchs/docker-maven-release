@@ -73,8 +73,12 @@ inputs:
     description: 'The maven options for the release'
     required: false
     default: ''
-  maven-development-version-number:
-    description: 'If define, this option allows you to define a custom development version number, like ${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}-SNAPSHOT'
+  maven-development-version-format-minor:
+    description: 'If define, this option allows you to define a custom development version format for minor releases, like ${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}-SNAPSHOT'
+    required: false
+    default: ''
+  maven-development-version-format-major:
+    description: 'If define, this option allows you to define a custom development version format for major releases, like ${parsedVersion.nextMajorVersion}.${parsedVersion.minorVersion}-SNAPSHOT'
     required: false
     default: ''
   maven-release-version-number:
@@ -100,18 +104,10 @@ inputs:
     required: false
     default: false
 
-  version-major:
-    description: 'Increment the major version number'
-    required: false
-    default: false
-  version-minor:
-    description: 'Increment the minor version number'
-    required: false
-    default: false
-  version-patch:
-    description: 'Increment the patch version number <- By default, we will increase the patch version'
-    required: false
-    default: false
+  version-core:
+    description: 'Choose between major, minor or patch release (default: minor)'
+    required: true
+    default: 'minor'
 
   m2-home-folder:
     description: 'M2 home folder'
@@ -163,8 +159,6 @@ runs:
 
     GITREPO_ACCESS_TOKEN: ${{ inputs.access-token }}
 
-    VERSION_MAJOR: ${{ inputs.version-major }}
-    VERSION_MINOR: ${{ inputs.version-minor }}
-    VERSION_PATCH: ${{ inputs.version-patch }}
+    VERSION_CORE: ${{ inputs.version-core }}
 
     RELEASE_BRANCH_NAME: ${{ inputs.release-branch-name }}
