@@ -28,7 +28,7 @@ fi
 #     echo "We are on the release branch"
 #fi
 
-Configure the default env variables
+#Configure the default env variables
 if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
   SSH_ROOT_FOLDER=~/.ssh
 fi
