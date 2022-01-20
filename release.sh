@@ -109,39 +109,41 @@ if [[ "$APP_VERSION" == *0 ]]; then
      git commit -am "Prepare version for next release"
 fi
 
-if [ "$VERSION_CORE" == "patch" ]; then
-    VERSION_MINOR="false"
-    VERSION_MAJOR="false"
-elif [ "$VERSION_CORE" == "minor" ]; then
-    VERSION_MINOR="true"
-    VERSION_MAJOR="false"
-elif [ "$VERSION_CORE" == "major" ]; then
-    VERSION_MINOR="false"
-    VERSION_MAJOR="true"
-fi
 
-# Setup next version
-echo "release script version-minor $VERSION_MINOR"
-echo "release script version-major $VERSION_MAJOR"
+## Setup next version for minor release
+echo "release script version-core $VERSION_CORE"
 DEVELOPMENT_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR" ]]; then
       DEVELOPMENT_VERSION_MINOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
 fi
 
-DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
+RELEASE_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.0"
+if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MINOR" ]]; then
+      RELEASE_VERSION_MINOR="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MINOR}"
+fi
+##
+
+## Setup next version for major release
+DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.1.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR" ]]; then
       DEVELOPMENT_VERSION_MAJOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
 fi
 
-if [[ "$VERSION_MINOR" == "true" ]]; then
-    echo "version-minor if branch"
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR"
-elif [[ "$VERSION_MAJOR" == "true" ]]; then
-    echo "version-major if branch"
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MAJOR"
-else
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT"
+RELEASE_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0"
+if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MAJOR" ]]; then
+      RELEASE_VERSION_MAJOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_RELEASE_VERSION_FORMAT_MAJOR}"
 fi
+##
+
+## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTIONS
+if [[ "$VERSION_CORE" == "minor" ]]; then
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR -DreleaseVersion=$RELEASE_VERSION_MINOR"
+elif [[ "$VERSION_CORE" == "major" ]]; then
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MAJOR -DreleaseVersion=$RELEASE_VERSION_MAJOR"
+else
+    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT -DreleaseVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
+fi
+##
 
 # Setup release version
 if [[ -n "$MAVEN_RELEASE_VERSION_NUMBER" ]]; then

@@ -81,8 +81,12 @@ inputs:
     description: 'If define, this option allows you to define a custom development version format for major releases, like ${parsedVersion.nextMajorVersion}.${parsedVersion.minorVersion}-SNAPSHOT'
     required: false
     default: ''
-  maven-release-version-number:
-    description: 'If define, this option allows you to define a custom release version number, like ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.0'
+  maven-release-version-format-minor:
+    description: 'If define, this option allows you to define a custom release version format for minor releases, like ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.0'
+    required: false
+    default: ''
+  maven-release-version-format-major:
+    description: 'If define, this option allows you to define a custom release version format for major releases, like ${parsedVersion.majorVersion}.0.0'
     required: false
     default: ''
 
@@ -143,7 +147,8 @@ runs:
     MAVEN_OPTION: ${{ inputs.maven-options}}
     MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR: ${{ inputs.maven-development-version-format-minor}}
     MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR: ${{ inputs.maven-development-version-format-major}}
-    MAVEN_RELEASE_VERSION_NUMBER: ${{ inputs.maven-release-version-number}}
+    MAVEN_RELEASE_VERSION_FORMAT_MINOR: ${{ inputs.maven-release-version-format-minor}}
+    MAVEN_RELEASE_VERSION_FORMAT_MAJOR: ${{ inputs.maven-release-version-format-major}}
 
     DOCKER_REGISTRY_ID: ${{ inputs.docker-registry-id }}
     DOCKER_REGISTRY_USERNAME: ${{ inputs.docker-registry-username }}
