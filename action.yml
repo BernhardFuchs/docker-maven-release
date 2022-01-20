@@ -1,0 +1,169 @@
+# action.yml
+name: 'Java Maven release'
+author: https://github.com/qcastel
+description: 'Release your Java application and publish artifacts'
+branding:
+  color: gray-dark
+  icon: aperture
+inputs:
+  release-branch-name:
+    description: 'Filter the branch to execute the release on'
+    required: false
+    default: 'master'
+  gpg-enabled:
+    description: 'Enable gpg signing'
+    required: false
+    default: false
+  gpg-key-id:
+    description: 'The GPG key ID'
+    required: false
+  gpg-key:
+    description: 'The GPG key'
+    required: false
+  gpg-passphrase:
+    description: 'The GPG passphrase'
+    required: false
+
+  ssh-private-key:
+    description: 'The SSH private key used during the maven release git commit'
+    required: false
+  ssh-passphrase:
+    description: 'The SSH passphrase'
+    required: false
+
+  git-release-bot-name:
+    description: 'The git user name for committing the release'
+    required: false
+    default: 'release-bot'
+  git-release-bot-email:
+    description: 'The git user email for committing the release'
+    required: false
+    default: 'release-bot@github.com'
+  git-skip-sanity-check:
+    description: 'Skip the git fetch and reset executed for safety by this action'
+    required: false
+    default: 'false'
+
+
+  maven-repo-server-id:
+    description: '!!DEPRECATED: Use maven-servers instead!! Maven server repository id to push the artifacts to'
+    required: false
+    default: ''
+  maven-repo-server-username:
+    description: '!!DEPRECATED: Use maven-servers instead!! Maven server repository username'
+    required: false
+    default: ''
+  maven-repo-server-password:
+    description: '!!DEPRECATED: Use maven-servers instead!! Maven server repository password'
+    required: false
+    default: ''
+  maven-servers:
+    description: 'The maven server repositories, in a JSON format. Example: [{"id": "serverId1", "username": "username", "password": "password1", "privateKey": "privatekey1", "passphrase": "passphrase1"}, {"id": "serverId2", "username": "username2", "password": "password2"}]'
+    required: false
+    default: '[]'
+  maven-args:
+    description: 'The maven arguments for the release'
+    required: false
+    default: ''
+  maven-project-folder:
+    description: 'You may have more than one maven projects inside the repo. This option allows you to specify the folder for which you want to trigger the release'
+    required: false
+    default: './'
+  maven-options:
+    description: 'The maven options for the release'
+    required: false
+    default: ''
+  maven-development-version-number:
+    description: 'If define, this option allows you to define a custom development version number, like ${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}-SNAPSHOT'
+    required: false
+    default: ''
+  maven-release-version-number:
+    description: 'If define, this option allows you to define a custom release version number, like ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.0'
+    required: false
+    default: ''
+
+  docker-registry-id:
+    description: 'The ID of your registry. For example, for docker hub, it is `registry.hub.docker.com`'
+    required: true
+    default: 'fake'
+  docker-registry-username:
+    description: 'The username for your docker registry'
+    required: true
+    default: 'fake'
+  docker-registry-password:
+    description: 'The password for your docker registry'
+    required: true
+    default: 'fake'
+
+  skip-perform:
+    description: 'Skip maven release perform'
+    required: false
+    default: false
+
+  version-major:
+    description: 'Increment the major version number'
+    required: false
+    default: false
+  version-minor:
+    description: 'Increment the minor version number'
+    required: false
+    default: false
+  version-patch:
+    description: 'Increment the patch version number <- By default, we will increase the patch version'
+    required: false
+    default: false
+
+  m2-home-folder:
+    description: 'M2 home folder'
+    required: false
+    default: '/root/.m2'
+
+
+  access-token:
+    description: 'Github access token. https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - release.sh
+  env:
+    GPG_ENABLED: ${{ inputs.gpg-enabled }}
+    GPG_KEY_ID: ${{ inputs.gpg-key-id }}
+    GPG_KEY: ${{ inputs.gpg-key }}
+    GPG_PASSPHRASE: ${{ inputs.gpg-passphrase }}
+
+    SSH_PRIVATE_KEY: ${{ inputs.ssh-private-key }}
+    SSH_ROOT_FOLDER: /root/.ssh
+    SSH_PASSPHRASE: ${{ inputs.ssh-passphrase }}
+
+    MAVEN_REPO_SERVER_ID: ${{ inputs.maven-repo-server-id }}
+    MAVEN_REPO_SERVER_USERNAME: ${{ inputs.maven-repo-server-username }}
+    MAVEN_REPO_SERVER_PASSWORD: ${{ inputs.maven-repo-server-password }}
+    MAVEN_SERVERS: ${{ inputs.maven-servers }}
+    MAVEN_PROJECT_FOLDER: ${{ inputs.maven-project-folder }}
+    MAVEN_ARGS: ${{ inputs.maven-args }}
+    MAVEN_OPTION: ${{ inputs.maven-options}}
+    MAVEN_DEVELOPMENT_VERSION_NUMBER: ${{ inputs.maven-development-version-number}}
+    MAVEN_RELEASE_VERSION_NUMBER: ${{ inputs.maven-release-version-number}}
+
+    DOCKER_REGISTRY_ID: ${{ inputs.docker-registry-id }}
+    DOCKER_REGISTRY_USERNAME: ${{ inputs.docker-registry-username }}
+    DOCKER_REGISTRY_PASSWORD: ${{ inputs.docker-registry-password }}
+
+    M2_HOME_FOLDER: ${{ inputs.m2-home-folder}}
+
+    GIT_RELEASE_BOT_NAME: ${{ inputs.git-release-bot-name }}
+    GIT_RELEASE_BOT_EMAIL: ${{ inputs.git-release-bot-email }}
+    SKIP_GIT_SANITY_CHECK: ${{ inputs.git-skip-sanity-check }}
+
+    SKIP_PERFORM: ${{ inputs.skip-perform }}
+
+    GITREPO_ACCESS_TOKEN: ${{ inputs.access-token }}
+
+    VERSION_MAJOR: ${{ inputs.version-major }}
+    VERSION_MINOR: ${{ inputs.version-minor }}
+    VERSION_PATCH: ${{ inputs.version-patch }}
+
+    RELEASE_BRANCH_NAME: ${{ inputs.release-branch-name }}
