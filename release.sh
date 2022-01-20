@@ -3,13 +3,13 @@ set -e
 
 
 # avoid the release loop by checking if the latest commit is a release commit
-readonly local last_release_commit_hash=$(git log --author="$GIT_RELEASE_BOT_NAME" --pretty=format:"%H" -1)
-echo "Last $GIT_RELEASE_BOT_NAME commit: ${last_release_commit_hash}"
-echo "Current commit: ${CI_COMMIT_SHA}"
-if [[ "${last_release_commit_hash}" = "${CI_COMMIT_SHA}" ]]; then
-     echo "Skipping for $GIT_RELEASE_BOT_NAME commit"
-     exit 0
-fi
+#readonly local last_release_commit_hash=$(git log --author="$GIT_RELEASE_BOT_NAME" --pretty=format:"%H" -1)
+#echo "Last $GIT_RELEASE_BOT_NAME commit: ${last_release_commit_hash}"
+#echo "Current commit: ${CI_COMMIT_SHA}"
+#if [[ "${last_release_commit_hash}" = "${CI_COMMIT_SHA}" ]]; then
+#     echo "Skipping for $GIT_RELEASE_BOT_NAME commit"
+#     exit 0
+#fi
 
 if [ -d "${M2_HOME_FOLDER}" ]; then
      echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache"; 
