@@ -172,7 +172,7 @@ mvn "$MAVEN_OPTION" build-helper:parse-version release:prepare -B -Darguments="$
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-  mvn "$MAVEN_OPTION" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+#  mvn "$MAVEN_OPTION" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
