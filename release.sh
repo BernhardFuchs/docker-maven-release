@@ -143,11 +143,11 @@ fi
 
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTION
 if [[ "$VERSION_CORE" == "minor" ]]; then
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR -DreleaseVersion=$RELEASE_VERSION_MINOR"
+    MAVEN_OPTION="$MAVEN_OPTION $DEVELOPMENT_VERSION_MINOR $RELEASE_VERSION_MINOR"
 elif [[ "$VERSION_CORE" == "major" ]]; then
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MAJOR -DreleaseVersion=$RELEASE_VERSION_MAJOR"
+    MAVEN_OPTION="$MAVEN_OPTION $DEVELOPMENT_VERSION_MAJOR $RELEASE_VERSION_MAJOR"
 else
-    MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT -DreleaseVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
+    MAVEN_OPTION="$MAVEN_OPTION \${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT \${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
 fi
 ##
 
