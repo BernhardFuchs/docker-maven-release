@@ -12,11 +12,11 @@ set -x
 #     exit 0
 #fi
 
-if [ -d "${M2_HOME_FOLDER}" ]; then
-     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache";
-else
-     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache";
-fi
+#if [ -d "${M2_HOME_FOLDER}" ]; then
+#     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache";
+#else
+#     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache";
+#fi
 
 # Filter the branch to execute the release on
 #readonly local branch=${CI_COMMIT_REF_NAME##*/}
@@ -30,36 +30,36 @@ fi
 #fi
 
 #Configure the default env variables
-if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
-  SSH_ROOT_FOLDER=~/.ssh
-fi
-echo "Using SSH folder ${SSH_ROOT_FOLDER}"
+#if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
+#  SSH_ROOT_FOLDER=~/.ssh
+#fi
+#echo "Using SSH folder ${SSH_ROOT_FOLDER}"
+#
+#if [[ -z "${M2_HOME_FOLDER}" ]]; then
+#  M2_HOME_FOLDER=/root/.m2
+#fi
+#echo "Using M2 repository folder ${M2_HOME_FOLDER}"
+#
+#if [ -z "$(ls -A ${M2_HOME_FOLDER})" ]; then
+#  echo "${M2_HOME_FOLDER} is empty, this means we didn't hit a potential M2 cache :("
+#fi
+#
+#if [[ -z "${GPG_ENABLED}" ]]; then
+#  echo "No GPG_ENABLED env setup -> GPG is disabled by default."
+#  export GPG_ENABLED=false
+#fi
 
-if [[ -z "${M2_HOME_FOLDER}" ]]; then
-  M2_HOME_FOLDER=/root/.m2
-fi
-echo "Using M2 repository folder ${M2_HOME_FOLDER}"
-
-if [ -z "$(ls -A ${M2_HOME_FOLDER})" ]; then
-  echo "${M2_HOME_FOLDER} is empty, this means we didn't hit a potential M2 cache :("
-fi
-
-if [[ -z "${GPG_ENABLED}" ]]; then
-  echo "No GPG_ENABLED env setup -> GPG is disabled by default."
-  export GPG_ENABLED=false
-fi
-
-echo "SKIP_GIT_SANITY_CHECK='${SKIP_GIT_SANITY_CHECK}'"
-
-if [[ "$SKIP_GIT_SANITY_CHECK" == "false" ]]; then
-  # Making sure we are on top of the branch
-  echo "Git checkout branch ${CI_COMMIT_REF_NAME##*/}"
-  git checkout ${CI_COMMIT_REF_NAME##*/}
-  echo "Git reset hard to ${CI_COMMIT_SHA}"
-  git reset --hard ${CI_COMMIT_SHA}
-else
-  echo "Skipping git sanity check"
-fi
+#echo "SKIP_GIT_SANITY_CHECK='${SKIP_GIT_SANITY_CHECK}'"
+#
+#if [[ "$SKIP_GIT_SANITY_CHECK" == "false" ]]; then
+#  # Making sure we are on top of the branch
+#  echo "Git checkout branch ${CI_COMMIT_REF_NAME##*/}"
+#  git checkout ${CI_COMMIT_REF_NAME##*/}
+#  echo "Git reset hard to ${CI_COMMIT_SHA}"
+#  git reset --hard ${CI_COMMIT_SHA}
+#else
+#  echo "Skipping git sanity check"
+#fi
 
 # This script will do a release of the artifact according to http://maven.apache.org/maven-release/maven-release-plugin/
 echo "Setup git user name to '$GIT_RELEASE_BOT_NAME'"
@@ -68,47 +68,47 @@ echo "Setup git user email to '$GIT_RELEASE_BOT_EMAIL'"
 git config --global user.email "$GIT_RELEASE_BOT_EMAIL";
 
 # Setup GPG
-echo "GPG_ENABLED '$GPG_ENABLED'"
-if [[ $GPG_ENABLED == "true" ]]; then
-     echo "Enable GPG signing in git config"
-     git config --global commit.gpgsign true
-     echo "Using the GPG key ID $GPG_KEY_ID"
-     git config --global user.signingkey $GPG_KEY_ID
-     echo "GPG_KEY_ID = $GPG_KEY_ID"
-     echo "Import the GPG key"
-     echo  "$GPG_KEY" | base64 -d > private.key
-     gpg --batch --import ./private.key
-     rm ./private.key
-     echo "List of keys:"
-     gpg --list-secret-keys --keyid-format LONG
-else
-  echo "GPG signing is not enabled"
-fi
+#echo "GPG_ENABLED '$GPG_ENABLED'"
+#if [[ $GPG_ENABLED == "true" ]]; then
+#     echo "Enable GPG signing in git config"
+#     git config --global commit.gpgsign true
+#     echo "Using the GPG key ID $GPG_KEY_ID"
+#     git config --global user.signingkey $GPG_KEY_ID
+#     echo "GPG_KEY_ID = $GPG_KEY_ID"
+#     echo "Import the GPG key"
+#     echo  "$GPG_KEY" | base64 -d > private.key
+#     gpg --batch --import ./private.key
+#     rm ./private.key
+#     echo "List of keys:"
+#     gpg --list-secret-keys --keyid-format LONG
+#else
+#  echo "GPG signing is not enabled"
+#fi
 
 #Setup SSH key
-if [[ -n "${SSH_PRIVATE_KEY}" ]]; then
-  echo "Add SSH key"
-  add-ssh-key.sh
-else
-  echo "No SSH key defined"
-fi
+#if [[ -n "${SSH_PRIVATE_KEY}" ]]; then
+#  echo "Add SSH key"
+#  add-ssh-key.sh
+#else
+#  echo "No SSH key defined"
+#fi
 
 # Change the current folder to point to the maven project folder
 if [[ -n "$MAVEN_PROJECT_FOLDER" ]]; then
   echo "Move to folder $MAVEN_PROJECT_FOLDER"
-  cd $MAVEN_PROJECT_FOLDER
+  cd "$MAVEN_PROJECT_FOLDER"
 fi
 
 # Setup the server credentials in the settings.xml
 setup-maven-servers.sh
 
-APP_VERSION=`xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml`
-#verify we are not on a release tag
-if [[ "$APP_VERSION" == *0 ]]; then
-     echo "Release is not a snapshot, move to next patch version and to snapshot"
-     mvn  build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT
-     git commit -am "Prepare version for next release"
-fi
+#APP_VERSION=`xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml`
+##verify we are not on a release tag
+#if [[ "$APP_VERSION" == *0 ]]; then
+#     echo "Release is not a snapshot, move to next patch version and to snapshot"
+#     mvn  build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT
+#     git commit -am "Prepare version for next release"
+#fi
 
 
 ## Setup next version for minor release
@@ -141,7 +141,7 @@ fi
 #echo "### Debug release version: $DEBUG_RELEASE_VERSION"
 #echo "### Debug release version: $DEBUG_DEVLOPMENT_VERSION"
 
-## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTIONS
+## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTION
 if [[ "$VERSION_CORE" == "minor" ]]; then
     MAVEN_OPTION="$MAVEN_OPTION -DdevelopmentVersion=$DEVELOPMENT_VERSION_MINOR -DreleaseVersion=$RELEASE_VERSION_MINOR"
 elif [[ "$VERSION_CORE" == "major" ]]; then
