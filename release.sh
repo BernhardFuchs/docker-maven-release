@@ -163,7 +163,7 @@ else
   echo "Not using access token authentication, as no access token (via env GITREPO_ACCESS_TOKEN) defined or because an SSH key is defined and setup (via env SSH_PRIVATE_KEY)"
 fi
 
-
+MAVEN_OPTION=$(echo "$MAVEN_OPTION" | xargs)
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
 mvn "$MAVEN_OPTION" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
@@ -180,7 +180,3 @@ if [[ "$?" -ne 0 ]] ; then
   echo "Rolling back release after failure"
   mvn "$MAVEN_OPTION" release:rollback -B -Darguments="$MAVEN_ARGS"
 fi
-
-
-mvn '-DdevelopmentVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}-SNAPSHOT -DreleaseVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0 -Dusername=***' build-helper:parse-version release:perform -B '-Darguments=-Dmaven.javadoc.skip=true -DskipITs'
-mvn '-DdevelopmentVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}-SNAPSHOT' '-DreleaseVersion=${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0' -Dusername=*** build-helper:parse-version release:prepare -B '-Darguments=-Dmaven.javadoc.skip=true -DskipITs'
