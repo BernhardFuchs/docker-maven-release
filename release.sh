@@ -114,17 +114,17 @@ fi
 echo "release script version-core $VERSION_CORE"
 DEVELOPMENT_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR" ]]; then
-      DEVELOPMENT_VERSION_MINOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
+      DEVELOPMENT_VERSION_MINOR="${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
 fi
 
 RELEASE_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.0"
 if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MINOR" ]]; then
-      RELEASE_VERSION_MINOR="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MINOR}"
+      RELEASE_VERSION_MINOR="${MAVEN_RELEASE_VERSION_FORMAT_MINOR}"
 fi
 ##
 
 ## Setup next version for major release
-DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.1.0-SNAPSHOT"
+DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR" ]]; then
       DEVELOPMENT_VERSION_MAJOR="${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
 fi
@@ -176,7 +176,7 @@ mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:prepa
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-  mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+#  mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
