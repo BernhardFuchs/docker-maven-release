@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+set -x
 
 
 # avoid the release loop by checking if the latest commit is a release commit
@@ -170,14 +171,13 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-set -x
 mvn build-helper:parse-version release:prepare "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-#  mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+  mvn build-helper:parse-version release:perform "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
