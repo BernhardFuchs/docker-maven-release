@@ -4,19 +4,19 @@ set -x
 
 
 # avoid the release loop by checking if the latest commit is a release commit
-#readonly local last_release_commit_hash=$(git log --author="$GIT_RELEASE_BOT_NAME" --pretty=format:"%H" -1)
-#echo "Last $GIT_RELEASE_BOT_NAME commit: ${last_release_commit_hash}"
-#echo "Current commit: ${CI_COMMIT_SHA}"
-#if [[ "${last_release_commit_hash}" = "${CI_COMMIT_SHA}" ]]; then
-#     echo "Skipping for $GIT_RELEASE_BOT_NAME commit"
-#     exit 0
-#fi
+readonly local last_release_commit_hash=$(git log --author="$GIT_RELEASE_BOT_NAME" --pretty=format:"%H" -1)
+echo "Last $GIT_RELEASE_BOT_NAME commit: ${last_release_commit_hash}"
+echo "Current commit: ${CI_COMMIT_SHA}"
+if [[ "${last_release_commit_hash}" = "${CI_COMMIT_SHA}" ]]; then
+     echo "Skipping for $GIT_RELEASE_BOT_NAME commit"
+     exit 0
+fi
 
-#if [ -d "${M2_HOME_FOLDER}" ]; then
-#     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache";
-#else
-#     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache";
-#fi
+if [ -d "${M2_HOME_FOLDER}" ]; then
+     echo "INFO - M2 folder '${M2_HOME_FOLDER}' not empty. We therefore will beneficy from the CI cache";
+else
+     echo "WARN - No M2 folder '${M2_HOME_FOLDER}' found. We therefore won't beneficy from the CI cache";
+fi
 
 # Filter the branch to execute the release on
 #readonly local branch=${CI_COMMIT_REF_NAME##*/}
@@ -30,36 +30,36 @@ set -x
 #fi
 
 #Configure the default env variables
-#if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
-#  SSH_ROOT_FOLDER=~/.ssh
-#fi
-#echo "Using SSH folder ${SSH_ROOT_FOLDER}"
-#
-#if [[ -z "${M2_HOME_FOLDER}" ]]; then
-#  M2_HOME_FOLDER=/root/.m2
-#fi
-#echo "Using M2 repository folder ${M2_HOME_FOLDER}"
-#
-#if [ -z "$(ls -A ${M2_HOME_FOLDER})" ]; then
-#  echo "${M2_HOME_FOLDER} is empty, this means we didn't hit a potential M2 cache :("
-#fi
-#
-#if [[ -z "${GPG_ENABLED}" ]]; then
-#  echo "No GPG_ENABLED env setup -> GPG is disabled by default."
-#  export GPG_ENABLED=false
-#fi
+if [[ -z "${SSH_ROOT_FOLDER}" ]]; then
+  SSH_ROOT_FOLDER=~/.ssh
+fi
+echo "Using SSH folder ${SSH_ROOT_FOLDER}"
+
+if [[ -z "${M2_HOME_FOLDER}" ]]; then
+  M2_HOME_FOLDER=/root/.m2
+fi
+echo "Using M2 repository folder ${M2_HOME_FOLDER}"
+
+if [ -z "$(ls -A ${M2_HOME_FOLDER})" ]; then
+  echo "${M2_HOME_FOLDER} is empty, this means we didn't hit a potential M2 cache :("
+fi
+
+if [[ -z "${GPG_ENABLED}" ]]; then
+  echo "No GPG_ENABLED env setup -> GPG is disabled by default."
+  export GPG_ENABLED=false
+fi
 
 #echo "SKIP_GIT_SANITY_CHECK='${SKIP_GIT_SANITY_CHECK}'"
-#
-#if [[ "$SKIP_GIT_SANITY_CHECK" == "false" ]]; then
-#  # Making sure we are on top of the branch
-#  echo "Git checkout branch ${CI_COMMIT_REF_NAME##*/}"
-#  git checkout ${CI_COMMIT_REF_NAME##*/}
-#  echo "Git reset hard to ${CI_COMMIT_SHA}"
-#  git reset --hard ${CI_COMMIT_SHA}
-#else
-#  echo "Skipping git sanity check"
-#fi
+
+if [[ "$SKIP_GIT_SANITY_CHECK" == "false" ]]; then
+  # Making sure we are on top of the branch
+  echo "Git checkout branch ${CI_COMMIT_REF_NAME##*/}"
+  git checkout ${CI_COMMIT_REF_NAME##*/}
+  echo "Git reset hard to ${CI_COMMIT_SHA}"
+  git reset --hard ${CI_COMMIT_SHA}
+else
+  echo "Skipping git sanity check"
+fi
 
 # This script will do a release of the artifact according to http://maven.apache.org/maven-release/maven-release-plugin/
 echo "Setup git user name to '$GIT_RELEASE_BOT_NAME'"
@@ -68,30 +68,30 @@ echo "Setup git user email to '$GIT_RELEASE_BOT_EMAIL'"
 git config --global user.email "$GIT_RELEASE_BOT_EMAIL";
 
 # Setup GPG
-#echo "GPG_ENABLED '$GPG_ENABLED'"
-#if [[ $GPG_ENABLED == "true" ]]; then
-#     echo "Enable GPG signing in git config"
-#     git config --global commit.gpgsign true
-#     echo "Using the GPG key ID $GPG_KEY_ID"
-#     git config --global user.signingkey $GPG_KEY_ID
-#     echo "GPG_KEY_ID = $GPG_KEY_ID"
-#     echo "Import the GPG key"
-#     echo  "$GPG_KEY" | base64 -d > private.key
-#     gpg --batch --import ./private.key
-#     rm ./private.key
-#     echo "List of keys:"
-#     gpg --list-secret-keys --keyid-format LONG
-#else
-#  echo "GPG signing is not enabled"
-#fi
+echo "GPG_ENABLED '$GPG_ENABLED'"
+if [[ $GPG_ENABLED == "true" ]]; then
+     echo "Enable GPG signing in git config"
+     git config --global commit.gpgsign true
+     echo "Using the GPG key ID $GPG_KEY_ID"
+     git config --global user.signingkey $GPG_KEY_ID
+     echo "GPG_KEY_ID = $GPG_KEY_ID"
+     echo "Import the GPG key"
+     echo  "$GPG_KEY" | base64 -d > private.key
+     gpg --batch --import ./private.key
+     rm ./private.key
+     echo "List of keys:"
+     gpg --list-secret-keys --keyid-format LONG
+else
+  echo "GPG signing is not enabled"
+fi
 
 #Setup SSH key
-#if [[ -n "${SSH_PRIVATE_KEY}" ]]; then
-#  echo "Add SSH key"
-#  add-ssh-key.sh
-#else
-#  echo "No SSH key defined"
-#fi
+if [[ -n "${SSH_PRIVATE_KEY}" ]]; then
+  echo "Add SSH key"
+  add-ssh-key.sh
+else
+  echo "No SSH key defined"
+fi
 
 # Change the current folder to point to the maven project folder
 if [[ -n "$MAVEN_PROJECT_FOLDER" ]]; then
@@ -111,7 +111,7 @@ setup-maven-servers.sh
 #fi
 
 
-## Setup next version for minor release
+## Setup version format for minor release
 echo "release script version-core $VERSION_CORE"
 DEVELOPMENT_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR" ]]; then
@@ -124,7 +124,7 @@ if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MINOR" ]]; then
 fi
 ##
 
-## Setup next version for major release
+## Setup version format for major release
 DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR" ]]; then
       DEVELOPMENT_VERSION_MAJOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
@@ -135,11 +135,6 @@ if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MAJOR" ]]; then
       RELEASE_VERSION_MAJOR="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MAJOR}"
 fi
 ##
-
-#DEBUG_RELEASE_VERSION=$(mvn help:evaluate -Dexpression="$RELEASE_VERSION_MAJOR")
-#DEBUG_DEVLOPMENT_VERSION=$(mvn help:evaluate -Dexpression="$DEVELOPMENT_VERSION_MAJOR")
-echo "### Debug release version: $RELEASE_VERSION_MAJOR"
-echo "### Debug release version: $DEVELOPMENT_VERSION_MAJOR"
 
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTION
 if [[ "$VERSION_CORE" == "minor" ]]; then
@@ -171,7 +166,7 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-mvn $MAVEN_OPTION build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
+mvn "$MAVEN_OPTION" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
@@ -183,5 +178,5 @@ fi
 # rollback release if prepare or perform failed
 if [[ "$?" -ne 0 ]] ; then
   echo "Rolling back release after failure"
-  mvn $MAVEN_OPTION release:rollback -B -Darguments="$MAVEN_ARGS"
+  mvn "$MAVEN_OPTION" release:rollback -B -Darguments="$MAVEN_ARGS"
 fi
