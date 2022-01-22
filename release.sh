@@ -138,8 +138,8 @@ fi
 
 #DEBUG_RELEASE_VERSION=$(mvn help:evaluate -Dexpression="$RELEASE_VERSION_MAJOR")
 #DEBUG_DEVLOPMENT_VERSION=$(mvn help:evaluate -Dexpression="$DEVELOPMENT_VERSION_MAJOR")
-#echo "### Debug release version: $DEBUG_RELEASE_VERSION"
-#echo "### Debug release version: $DEBUG_DEVLOPMENT_VERSION"
+echo "### Debug release version: $RELEASE_VERSION_MAJOR"
+echo "### Debug release version: $DEVELOPMENT_VERSION_MAJOR"
 
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTION
 if [[ "$VERSION_CORE" == "minor" ]]; then
@@ -171,17 +171,17 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
+mvn $MAVEN_OPTION build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-  mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+#  mvn "$MAVEN_OPTION" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
 if [[ "$?" -ne 0 ]] ; then
   echo "Rolling back release after failure"
-  mvn $MAVEN_OPTION $MAVEN_REPO_LOCAL release:rollback -B -Darguments="$MAVEN_ARGS"
+  mvn $MAVEN_OPTION release:rollback -B -Darguments="$MAVEN_ARGS"
 fi
