@@ -170,9 +170,8 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-MVN_COMMAND=$(mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS")
-echo "### maven command:"
-echo "$MVN_COMMAND"
+set -x
+mvn "$MAVEN_OPTION" "$MAVEN_REPO_LOCAL" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
