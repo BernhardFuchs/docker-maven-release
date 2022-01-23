@@ -115,68 +115,67 @@ setup-maven-servers.sh
 echo "release script version-core $VERSION_CORE"
 DEVELOPMENT_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR" ]]; then
-      DEVELOPMENT_VERSION_MINOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
+      DEVELOPMENT_VERSION_MINOR="-DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MINOR}"
 fi
 
 RELEASE_VERSION_MINOR="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.0"
 if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MINOR" ]]; then
-      RELEASE_VERSION_MINOR="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MINOR}"
+      RELEASE_VERSION_MINOR="-DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MINOR}"
 fi
 ##
 
 ## Setup version format for major release
 DEVELOPMENT_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0-SNAPSHOT"
 if [[ -n "$MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR" ]]; then
-      DEVELOPMENT_VERSION_MAJOR="$MAVEN_OPTION -DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
+      DEVELOPMENT_VERSION_MAJOR="-DdevelopmentVersion=${MAVEN_DEVELOPMENT_VERSION_FORMAT_MAJOR}"
 fi
 
 RELEASE_VERSION_MAJOR="\${parsedVersion.nextMajorVersion}.0.0"
 if [[ -n "$MAVEN_RELEASE_VERSION_FORMAT_MAJOR" ]]; then
-      RELEASE_VERSION_MAJOR="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MAJOR}"
+      RELEASE_VERSION_MAJOR="-DreleaseVersion=${MAVEN_RELEASE_VERSION_FORMAT_MAJOR}"
 fi
 ##
 
 ## Set -DdevelopmentVersion and -DreleaseVersion to MAVEN_OPTION
 if [[ "$VERSION_CORE" == "minor" ]]; then
-    MAVEN_OPTION="$MAVEN_OPTION $DEVELOPMENT_VERSION_MINOR $RELEASE_VERSION_MINOR"
+    MAVEN_OPTION=("$DEVELOPMENT_VERSION_MINOR $RELEASE_VERSION_MINOR")
 elif [[ "$VERSION_CORE" == "major" ]]; then
-    MAVEN_OPTION="$MAVEN_OPTION $DEVELOPMENT_VERSION_MAJOR $RELEASE_VERSION_MAJOR"
+    MAVEN_OPTION=("$DEVELOPMENT_VERSION_MAJOR $RELEASE_VERSION_MAJOR")
 else
-    MAVEN_OPTION="$MAVEN_OPTION \${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT \${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}"
+    MAVEN_OPTION=("\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT \${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}")
 fi
 ##
 
 # Setup release version
 if [[ -n "$MAVEN_RELEASE_VERSION_NUMBER" ]]; then
-      MAVEN_OPTION="$MAVEN_OPTION -DreleaseVersion=${MAVEN_RELEASE_VERSION_NUMBER}"
+      MAVEN_OPTION=("${MAVEN_OPTION[@]} -DreleaseVersion=${MAVEN_RELEASE_VERSION_NUMBER}")
 fi
 
 echo "#### MAVEN_OPTIONS ####"
-echo "$MAVEN_OPTION"
+echo "${MAVEN_OPTION[@]}"
 printf "\n#### END MAVEN_OPTIONS ####"
 
 # Set access-token for gitrepo
 if [[ -n "$GITREPO_ACCESS_TOKEN" && -z "${SSH_PRIVATE_KEY}" ]]; then
     echo "Git repo access token defined and no SSH setup. We then use the git repo access token via maven release to commit in the repo."
-    MAVEN_OPTION="$MAVEN_OPTION -Dusername=$GITREPO_ACCESS_TOKEN"
+    MAVEN_OPTION=("${MAVEN_OPTION[@]} -Dusername=$GITREPO_ACCESS_TOKEN")
 else
   echo "Not using access token authentication, as no access token (via env GITREPO_ACCESS_TOKEN) defined or because an SSH key is defined and setup (via env SSH_PRIVATE_KEY)"
 fi
 
-MAVEN_OPTION=$(echo "$MAVEN_OPTION" | xargs)
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-mvn "$MAVEN_OPTION" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
+mvn "${MAVEN_OPTION[@]}" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-#  mvn "$MAVEN_OPTION" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+  mvn "${MAVEN_OPTION[@]}" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
 if [[ "$?" -ne 0 ]] ; then
   echo "Rolling back release after failure"
-  mvn "$MAVEN_OPTION" release:rollback -B -Darguments="$MAVEN_ARGS"
+  mvn "${MAVEN_OPTION[@]}" release:rollback -B -Darguments="$MAVEN_ARGS"
 fi
