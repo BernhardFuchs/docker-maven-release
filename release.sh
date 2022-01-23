@@ -165,17 +165,17 @@ fi
 
 # Do the release
 echo "Do mvn release:prepare with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-mvn "${MAVEN_OPTION[@]}" build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
+mvn ${MAVEN_OPTION[@]} build-helper:parse-version release:prepare -B -Darguments="$MAVEN_ARGS"
 
 
 # do release if prepare did not fail
 if [[ ("$?" -eq 0) && ($SKIP_PERFORM == "false") ]]; then
   echo "Do mvn release:perform with options $MAVEN_OPTION and arguments $MAVEN_ARGS"
-  mvn "${MAVEN_OPTION[@]}" build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
+  mvn ${MAVEN_OPTION[@]} build-helper:parse-version release:perform -B -Darguments="$MAVEN_ARGS"
 fi
 
 # rollback release if prepare or perform failed
 if [[ "$?" -ne 0 ]] ; then
   echo "Rolling back release after failure"
-  mvn "${MAVEN_OPTION[@]}" release:rollback -B -Darguments="$MAVEN_ARGS"
+  mvn ${MAVEN_OPTION[@]} release:rollback -B -Darguments="$MAVEN_ARGS"
 fi
