@@ -66,6 +66,8 @@ echo "Setup git user name to '$GIT_RELEASE_BOT_NAME'"
 git config --global user.name "$GIT_RELEASE_BOT_NAME";
 echo "Setup git user email to '$GIT_RELEASE_BOT_EMAIL'"
 git config --global user.email "$GIT_RELEASE_BOT_EMAIL";
+echo "Setup git safe.directory to /github/workspace"
+git config --global --add safe.directory /github/workspace
 
 # Setup GPG
 echo "GPG_ENABLED '$GPG_ENABLED'"
