@@ -1,10 +1,10 @@
-FROM alpine:3
+FROM eclipse-temurin
 
-RUN apk --update --no-cache add bash maven git openssh gnupg libxml2-utils vim openjdk8 jq
-RUN apk --update add openjdk17 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-RUN apk --update add openjdk19 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-RUN apk --update add openjdk21 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-RUN apk add bash gettext patch
+#RUN apk --update --no-cache add bash maven git openssh gnupg libxml2-utils vim openjdk8 jq
+#RUN apk --update add openjdk17 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+#RUN apk --update add openjdk19 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+#RUN apk --update add openjdk21 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+#RUN apk add bash gettext patch
 
 COPY ./add-ssh-key.sh /usr/local/bin
 COPY ./setup-maven-servers.sh /usr/local/bin
