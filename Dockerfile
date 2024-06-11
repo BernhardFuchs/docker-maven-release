@@ -1,4 +1,4 @@
-FROM eclipse-temurin
+FROM eclipse-temurin:latest-alpine
 
 RUN apk --update --no-cache add bash maven git openssh gnupg libxml2-utils vim openjdk8 jq gettext patch
 
